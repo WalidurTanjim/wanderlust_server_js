@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from "express";
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import cors from "cors";
 
 const app = express();
@@ -44,6 +44,24 @@ app.get("/travel-package", async(req, res) => {
      }catch(err) {
           console.error("Destination get error:", err);
           return res.status(500).json({ success: false, message: "Internal server error", error: err?.message })
+     }
+})
+
+app.get("/travel-package/:id", async(req, res) => {
+     try{
+          const id = req?.params?.id;
+          console.log(id);
+          const query = { _id: new ObjectId(id) };
+          const cursor = await destinationsCollection.findOne(query);
+
+          if(cursor) {
+               return res.status(200).json({ success: true, message: "Destination fetched successfully", data: cursor })
+          }
+
+          return res.status(404).json({ success: false, message: "Something went wrong! Try again" })
+     }catch(err) {
+          console.error("Package details error:", err);
+          return res.status(404).json({ success: false, message: "Internal server error", error: err?.message })
      }
 })
 
