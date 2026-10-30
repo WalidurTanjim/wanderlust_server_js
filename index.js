@@ -32,7 +32,22 @@ app.get('/', (req, res) => {
      res.send("Server is working well.//")
 })
 
-app.post("/add-travel-package", async(req, res) => {
+app.get("/travel-package", async(req, res) => {
+     try{
+          const cursor = await destinationsCollection.find({}).toArray();
+
+          if(cursor) {
+               return res.status(200).json({ success: true, message: "Destination fetched successfully", data: cursor })
+          }
+
+          return res.status(404).json({ success: false, message: "Something went wrong! Try again" })
+     }catch(err) {
+          console.error("Destination get error:", err);
+          return res.status(500).json({ success: false, message: "Internal server error", error: err?.message })
+     }
+})
+
+app.post("/travel-package", async(req, res) => {
      try{
           const body = await req?.body;
           const result = await destinationsCollection.insertOne(body);
